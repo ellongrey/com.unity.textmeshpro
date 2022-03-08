@@ -22,8 +22,26 @@ namespace TMPro
 
 
     [Serializable][ExcludeFromPresetAttribute]
-    public class TMP_FontAsset : TMP_Asset
+    public class TMP_FontAsset : TMP_Asset, ISerializationCallbackReceiver
     {
+        void ISerializationCallbackReceiver.OnBeforeSerialize()
+        {
+            m_SerializedGlyphTable?.Clear();
+            m_SerializedCharacterTable?.Clear();
+            m_SerializedUsedGlyphRects?.Clear();
+            m_SerializedFreeGlyphRects?.Clear();
+            m_SerializedFontFeatureTable?.glyphPairAdjustmentRecords?.Clear();
+        }
+
+        void ISerializationCallbackReceiver.OnAfterDeserialize()
+        {
+            m_GlyphTable = new(m_SerializedGlyphTable);
+            m_CharacterTable = new(m_SerializedCharacterTable);
+            m_UsedGlyphRects = new(m_SerializedUsedGlyphRects);
+            m_FreeGlyphRects = new(m_SerializedFreeGlyphRects);
+            m_FontFeatureTable = m_SerializedFontFeatureTable;
+        }
+
         /// <summary>
         /// The version of the font asset class.
         /// Version 1.1.0 adds support for the new TextCore.FontEngine and Dynamic SDF system.
@@ -101,8 +119,12 @@ namespace TMPro
             get { return m_GlyphTable; }
             internal set { m_GlyphTable = value; }
         }
-        [SerializeField]
-        internal List<Glyph> m_GlyphTable = new List<Glyph>();
+        
+        [NonSerialized]
+        private List<Glyph> m_GlyphTable = new List<Glyph>();
+
+        [SerializeField] [FormerlySerializedAs(nameof(m_GlyphTable))]
+        private List<Glyph> m_SerializedGlyphTable = new List<Glyph>();
 
         /// <summary>
         /// Dictionary used to lookup glyphs contained in the font asset by their index.
@@ -128,8 +150,12 @@ namespace TMPro
             get { return m_CharacterTable; }
             internal set { m_CharacterTable = value; }
         }
-        [SerializeField]
-        internal List<TMP_Character> m_CharacterTable = new List<TMP_Character>();
+        
+        [NonSerialized]
+        private List<TMP_Character> m_CharacterTable = new List<TMP_Character>();
+
+        [SerializeField] [FormerlySerializedAs(nameof(m_CharacterTable))]
+        private List<TMP_Character> m_SerializedCharacterTable = new List<TMP_Character>();
 
         /// <summary>
         /// Dictionary used to lookup characters contained in the font asset by their unicode values.
@@ -245,8 +271,11 @@ namespace TMPro
             get { return m_UsedGlyphRects; }
             set { m_UsedGlyphRects = value; }
         }
-        [SerializeField]
+        [NonSerialized]
         private List<GlyphRect> m_UsedGlyphRects;
+
+        [SerializeField] [FormerlySerializedAs(nameof(m_UsedGlyphRects))]
+        private List<GlyphRect> m_SerializedUsedGlyphRects;
 
         /// <summary>
         /// List of spaces available in a given texture to add new glyphs.
@@ -256,8 +285,11 @@ namespace TMPro
             get { return m_FreeGlyphRects; }
             set { m_FreeGlyphRects = value; }
         }
-        [SerializeField]
+        [NonSerialized]
         private List<GlyphRect> m_FreeGlyphRects;
+
+        [SerializeField] [FormerlySerializedAs(nameof(m_FreeGlyphRects))]
+        private List<GlyphRect> m_SerializedFreeGlyphRects;
 
         /// <summary>
         /// The general information about the font.
@@ -335,8 +367,11 @@ namespace TMPro
             get { return m_FontFeatureTable; }
             internal set { m_FontFeatureTable = value; }
         }
-        [SerializeField]
+        [NonSerialized]
         internal TMP_FontFeatureTable m_FontFeatureTable = new TMP_FontFeatureTable();
+
+        [SerializeField] [FormerlySerializedAs(nameof(m_FontFeatureTable))]
+        internal TMP_FontFeatureTable m_SerializedFontFeatureTable = new TMP_FontFeatureTable();
 
         // Legacy field that will eventually be removed
         [SerializeField]

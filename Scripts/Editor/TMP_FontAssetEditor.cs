@@ -247,7 +247,7 @@ namespace TMPro.EditorUtilities
             m_GlyphTable_prop = serializedObject.FindProperty("m_GlyphTable");
 
             m_FontFeatureTable_prop = serializedObject.FindProperty("m_FontFeatureTable");
-            m_GlyphPairAdjustmentRecords_prop = m_FontFeatureTable_prop.FindPropertyRelative("m_GlyphPairAdjustmentRecords");
+            m_GlyphPairAdjustmentRecords_prop = m_FontFeatureTable_prop?.FindPropertyRelative("m_GlyphPairAdjustmentRecords");
 
             m_fontAsset = target as TMP_FontAsset;
             m_FontFeatureTable = m_fontAsset.fontFeatureTable;
