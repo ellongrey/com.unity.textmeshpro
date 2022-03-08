@@ -26,20 +26,53 @@ namespace TMPro
     {
         void ISerializationCallbackReceiver.OnBeforeSerialize()
         {
-            m_SerializedGlyphTable?.Clear();
-            m_SerializedCharacterTable?.Clear();
-            m_SerializedUsedGlyphRects?.Clear();
-            m_SerializedFreeGlyphRects?.Clear();
-            m_SerializedFontFeatureTable?.glyphPairAdjustmentRecords?.Clear();
+            switch (m_AtlasPopulationMode)
+            {
+                case AtlasPopulationMode.Static:
+                    m_SerializedGlyphTable = new(m_GlyphTable);
+                    m_SerializedCharacterTable = new(m_CharacterTable);
+                    m_SerializedUsedGlyphRects = new(m_UsedGlyphRects);
+                    m_SerializedFreeGlyphRects = new(m_FreeGlyphRects);
+                    
+                    // TODO: FontFeatureTable
+                    break;
+                
+                case AtlasPopulationMode.Dynamic:
+                    m_SerializedGlyphTable?.Clear();
+                    m_SerializedCharacterTable?.Clear();
+                    m_SerializedUsedGlyphRects?.Clear();
+                    m_SerializedFreeGlyphRects?.Clear();
+                    m_SerializedFontFeatureTable?.glyphPairAdjustmentRecords?.Clear();
+                    break;
+            }
         }
 
         void ISerializationCallbackReceiver.OnAfterDeserialize()
         {
-            m_GlyphTable = new(m_SerializedGlyphTable);
-            m_CharacterTable = new(m_SerializedCharacterTable);
-            m_UsedGlyphRects = new(m_SerializedUsedGlyphRects);
-            m_FreeGlyphRects = new(m_SerializedFreeGlyphRects);
-            m_FontFeatureTable = m_SerializedFontFeatureTable;
+            switch (m_AtlasPopulationMode)
+            {
+                case AtlasPopulationMode.Static:
+                    m_GlyphTable = new(m_SerializedGlyphTable);
+                    m_CharacterTable = new(m_SerializedCharacterTable);
+                    m_UsedGlyphRects = new(m_SerializedUsedGlyphRects);
+                    m_FreeGlyphRects = new(m_SerializedFreeGlyphRects);
+
+                    // TODO: FontFeatureTable
+                    break;
+                
+                case AtlasPopulationMode.Dynamic:
+                    m_GlyphTable = new();
+                    m_CharacterTable = new();
+
+                    int packingModifier = ((GlyphRasterModes)atlasRenderMode & GlyphRasterModes.RASTER_MODE_BITMAP) == GlyphRasterModes.RASTER_MODE_BITMAP ? 0 : 1;
+            
+                    m_FreeGlyphRects = new() { new GlyphRect(0, 0, atlasWidth - packingModifier, atlasHeight - packingModifier) };
+                    m_UsedGlyphRects = new();
+
+                    // TODO: FontFeatureTable
+                    break;
+                
+            }
         }
 
         /// <summary>
