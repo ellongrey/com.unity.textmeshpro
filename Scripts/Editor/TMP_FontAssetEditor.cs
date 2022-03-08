@@ -203,7 +203,7 @@ namespace TMPro.EditorUtilities
         {
             m_FaceInfo_prop = serializedObject.FindProperty("m_FaceInfo");
 
-            font_atlas_prop = serializedObject.FindProperty("m_AtlasTextures").GetArrayElementAtIndex(0);
+            font_atlas_prop = serializedObject.FindProperty("m_AtlasTextures")?.GetArrayElementAtIndex(0);
             font_material_prop = serializedObject.FindProperty("material");
 
             m_AtlasPopulationMode_prop = serializedObject.FindProperty("m_AtlasPopulationMode");
@@ -554,7 +554,8 @@ namespace TMPro.EditorUtilities
                 EditorGUI.indentLevel = 1;
 
                 GUI.enabled = false;
-                EditorGUILayout.PropertyField(font_atlas_prop, new GUIContent("Font Atlas"));
+                if (font_atlas_prop != null)
+                    EditorGUILayout.PropertyField(font_atlas_prop, new GUIContent("Font Atlas"));
                 EditorGUILayout.PropertyField(font_material_prop, new GUIContent("Font Material"));
                 GUI.enabled = true;
                 EditorGUILayout.Space();

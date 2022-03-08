@@ -26,6 +26,8 @@ namespace TMPro
     {
         void ISerializationCallbackReceiver.OnBeforeSerialize()
         {
+            material.SetTexture(ShaderUtilities.ID_MainTex, null);
+            
             switch (m_AtlasPopulationMode)
             {
                 case AtlasPopulationMode.Static:
@@ -58,6 +60,7 @@ namespace TMPro
                     m_FreeGlyphRects = new(m_SerializedFreeGlyphRects);
 
                     // TODO: FontFeatureTable
+                    
                     break;
                 
                 case AtlasPopulationMode.Dynamic:
@@ -70,8 +73,20 @@ namespace TMPro
                     m_UsedGlyphRects = new();
 
                     // TODO: FontFeatureTable
+
+                    m_AtlasTexture = null;
+                    m_AtlasTextures = new Texture2D[1];
+                    m_AtlasTextureIndex = 0;
                     break;
-                
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (m_AtlasTextures != null)
+            {
+                foreach (var tex in m_AtlasTextures)
+                    DestroyImmediate(tex);
             }
         }
 
@@ -259,14 +274,22 @@ namespace TMPro
                 m_AtlasTextures = value;
             }
         }
-        [SerializeField]
-        internal Texture2D[] m_AtlasTextures;
+
+        [NonSerialized]
+        private Texture2D[] m_AtlasTextures;
+
+        [SerializeField] [FormerlySerializedAs(nameof(m_AtlasTextures))]
+        private Texture2D[] m_SerializedAtlasTextures;
 
         /// <summary>
         /// Index of the font atlas texture that still has available space to add new glyphs.
         /// </summary>
-        [SerializeField]
+        [NonSerialized]
         internal int m_AtlasTextureIndex;
+        
+        [SerializeField] [FormerlySerializedAs(nameof(m_AtlasTextureIndex))]
+        private int m_SerializedAtlasTextureIndex;
+
 
         /// <summary>
         /// Number of atlas textures used by this font asset.
@@ -2127,6 +2150,19 @@ namespace TMPro
             //    }
             //}
 
+            if (m_AtlasPopulationMode == AtlasPopulationMode.Dynamic && m_AtlasTextures[m_AtlasTextureIndex] == null) 
+            {
+                Debug.Log($"Create texture for dynamic font {name}");
+                var texture = new Texture2D(m_AtlasWidth, m_AtlasHeight, TextureFormat.Alpha8, false);
+                m_AtlasTextures[m_AtlasTextureIndex] = texture;
+                FontEngineEditorUtilities.SetAtlasTextureIsReadable(texture, true);
+                FontEngine.ResetAtlasTexture(texture);
+                // int packingModifier = ((GlyphRasterModes)atlasRenderMode & GlyphRasterModes.RASTER_MODE_BITMAP) == GlyphRasterModes.RASTER_MODE_BITMAP ? 0 : 1;
+                // m_FreeGlyphRects = new() { new GlyphRect(0, 0, atlasWidth - packingModifier, atlasHeight - packingModifier) };
+                // m_UsedGlyphRects = new();
+                material.SetTexture(ShaderUtilities.ID_MainTex, texture);
+            }
+
             // Make sure atlas texture is readable.
             if (m_AtlasTextures[m_AtlasTextureIndex].isReadable == false)
             {
@@ -2482,7 +2518,7 @@ namespace TMPro
                 Texture2D tex = m_AtlasTextures[m_AtlasTextureIndex];
                 tex.name = m_AtlasTexture.name + " " + m_AtlasTextureIndex;
 
-                UnityEditor.AssetDatabase.AddObjectToAsset(m_AtlasTextures[m_AtlasTextureIndex], this);
+                // UnityEditor.AssetDatabase.AddObjectToAsset(m_AtlasTextures[m_AtlasTextureIndex], this);
                 TMP_EditorResourceManager.RegisterResourceForReimport(this);
             }
             #endif

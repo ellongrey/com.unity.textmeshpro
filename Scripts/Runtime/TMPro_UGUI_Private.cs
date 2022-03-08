@@ -560,12 +560,16 @@ namespace TMPro
                 }
 
                 // If font atlas texture doesn't match the assigned material font atlas, switch back to default material specified in the Font Asset.
-                if (m_sharedMaterial == null || m_sharedMaterial.GetTexture(ShaderUtilities.ID_MainTex) == null || m_fontAsset.atlasTexture.GetInstanceID() != m_sharedMaterial.GetTexture(ShaderUtilities.ID_MainTex).GetInstanceID())
+                if (m_sharedMaterial == null || m_sharedMaterial.GetTexture(ShaderUtilities.ID_MainTex) == null || m_fontAsset.atlasTexture?.GetInstanceID() != m_sharedMaterial.GetTexture(ShaderUtilities.ID_MainTex)?.GetInstanceID())
                 {
+                    Debug.Log("alala");
                     if (m_fontAsset.material == null)
                         Debug.LogWarning("The Font Atlas Texture of the Font Asset " + m_fontAsset.name + " assigned to " + gameObject.name + " is missing.", this);
                     else
+                    {
                         m_sharedMaterial = m_fontAsset.material;
+                        m_fontAsset.material.SetTexture(ShaderUtilities.ID_MainTex, m_fontAsset.atlasTexture);
+                    }
                 }
             }
 
@@ -1671,6 +1675,9 @@ namespace TMPro
                     m_AutoSizeIterationCount += 1;
                 }
             }
+
+            if (m_sharedMaterial)
+                m_sharedMaterial.SetTexture(ShaderUtilities.ID_MainTex, m_fontAsset.atlasTexture);
         }
 
 
