@@ -568,7 +568,17 @@ namespace TMPro
                     else
                     {
                         m_sharedMaterial = m_fontAsset.material;
+
+                        if (m_fontAsset.atlasTexture == null)
+                        {
+                            Debug.Log("Null atlas detected");
+                            m_havePropertiesChanged = true;
+                            SetVerticesDirty();
+                            m_fontAsset.EnsureAtlasTextureInitialized();
+                        }
+
                         m_fontAsset.material.SetTexture(ShaderUtilities.ID_MainTex, m_fontAsset.atlasTexture);
+                        Debug.Log($"font atlas: {m_fontAsset.atlasTexture}");
                     }
                 }
             }

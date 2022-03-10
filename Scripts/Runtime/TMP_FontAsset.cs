@@ -363,8 +363,8 @@ namespace TMPro
         /// <summary>
         ///
         /// </summary>
-        [SerializeField]
-        public Texture2D atlas; // Should add a property to make this read-only.
+        [SerializeField] [FormerlySerializedAs("atlas")]
+        private Texture2D _oldAtlas; // Should add a property to make this read-only.
 
         /// <summary>
         /// The width of the atlas texture(s) used by this font asset.
@@ -2044,6 +2044,30 @@ namespace TMPro
         }
         */
 
+        public Texture2D EnsureAtlasTextureInitialized()
+        {
+            if (m_AtlasTextures[m_AtlasTextureIndex] != null)
+                return m_AtlasTextures[m_AtlasTextureIndex];
+            
+            Debug.Log($"Creating texture atlas for dynamic font {name}");
+            var texture = new Texture2D(m_AtlasWidth, m_AtlasHeight, TextureFormat.Alpha8, false);
+            m_AtlasTextures[m_AtlasTextureIndex] = texture;
+            
+            FontEngineEditorUtilities.SetAtlasTextureIsReadable(texture, true);
+            FontEngine.ResetAtlasTexture(texture);
+            
+            int packingModifier = ((GlyphRasterModes)atlasRenderMode & GlyphRasterModes.RASTER_MODE_BITMAP) == GlyphRasterModes.RASTER_MODE_BITMAP ? 0 : 1;
+            m_FreeGlyphRects = new() { new GlyphRect(0, 0, atlasWidth - packingModifier, atlasHeight - packingModifier) };
+            m_UsedGlyphRects = new();
+            
+            m_CharacterLookupDictionary.Clear();
+            m_GlyphTable.Clear();
+            m_GlyphLookupDictionary.Clear();
+            m_GlyphIndexListNewlyAdded.Clear();
+            m_GlyphIndexList.Clear();
+
+            return m_AtlasTextures[m_AtlasTextureIndex];
+        }
 
         /// <summary>
         /// Try adding character using Unicode value to font asset.
@@ -2150,16 +2174,9 @@ namespace TMPro
             //    }
             //}
 
-            if (m_AtlasPopulationMode == AtlasPopulationMode.Dynamic && m_AtlasTextures[m_AtlasTextureIndex] == null) 
+            if (m_AtlasPopulationMode == AtlasPopulationMode.Dynamic && m_AtlasTextures[m_AtlasTextureIndex] == null)
             {
-                Debug.Log($"Create texture for dynamic font {name}");
-                var texture = new Texture2D(m_AtlasWidth, m_AtlasHeight, TextureFormat.Alpha8, false);
-                m_AtlasTextures[m_AtlasTextureIndex] = texture;
-                FontEngineEditorUtilities.SetAtlasTextureIsReadable(texture, true);
-                FontEngine.ResetAtlasTexture(texture);
-                // int packingModifier = ((GlyphRasterModes)atlasRenderMode & GlyphRasterModes.RASTER_MODE_BITMAP) == GlyphRasterModes.RASTER_MODE_BITMAP ? 0 : 1;
-                // m_FreeGlyphRects = new() { new GlyphRect(0, 0, atlasWidth - packingModifier, atlasHeight - packingModifier) };
-                // m_UsedGlyphRects = new();
+                var texture = EnsureAtlasTextureInitialized();
                 material.SetTexture(ShaderUtilities.ID_MainTex, texture);
             }
 
@@ -2996,7 +3013,7 @@ namespace TMPro
             if (m_AtlasTextures == null || m_AtlasTextures.Length == 0)
                 m_AtlasTextures = new Texture2D[1];
 
-            m_AtlasTextures[0] = atlas;
+            m_AtlasTextures[0] = _oldAtlas;
 
             //atlas = null;
 
