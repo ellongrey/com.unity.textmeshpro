@@ -98,7 +98,7 @@ namespace TMPro
         /// </summary>
         private void PerformUpdateForCanvasRendererObjects()
         {
-            //Debug.Log("Performing update of CanvasRenderer objects at Frame: " + Time.frameCount);
+            Debug.Log("Performing update of CanvasRenderer objects at Frame: " + Time.frameCount);
 
             // Processing elements that require a layout rebuild.
             //this.m_PerformingLayoutUpdate = true;

@@ -26,6 +26,26 @@ namespace TMPro
     {
         void ISerializationCallbackReceiver.OnBeforeSerialize()
         {
+            return;
+            
+            if (m_AtlasTextures != null)
+            {
+                for (int i = 0; i < m_AtlasTextures.Length; ++i)
+                {
+                    if (m_AtlasTextures[i] != null)
+                    {
+                        DestroyImmediate(m_AtlasTextures[i], allowDestroyingAssets: true);
+                        m_AtlasTextures[i] = null;
+                    }
+                }
+            
+                if (m_AtlasTextures.Length > 1)
+                {
+                    m_AtlasTextures = new Texture2D[1];
+                    m_AtlasTextureIndex = 0;
+                }
+            }
+
             material.SetTexture(ShaderUtilities.ID_MainTex, null);
             
             switch (m_AtlasPopulationMode)
@@ -243,7 +263,9 @@ namespace TMPro
             {
                 if (m_AtlasTexture == null)
                 {
-                    m_AtlasTexture = atlasTextures[0];
+                    m_AtlasTexture = atlasTextures?[0];
+                    if (m_AtlasTexture == null)
+                        EnsureAtlasTextureInitialized();
                 }
 
                 return m_AtlasTexture;
@@ -594,7 +616,7 @@ namespace TMPro
                 Material tmp_material = new Material(ShaderUtilities.ShaderRef_MobileBitmap);
 
                 //tmp_material.name = texture.name + " Material";
-                tmp_material.SetTexture(ShaderUtilities.ID_MainTex, texture);
+                // tmp_material.SetTexture(ShaderUtilities.ID_MainTex, texture);
                 tmp_material.SetFloat(ShaderUtilities.ID_TextureWidth, atlasWidth);
                 tmp_material.SetFloat(ShaderUtilities.ID_TextureHeight, atlasHeight);
 
@@ -608,7 +630,7 @@ namespace TMPro
                 Material tmp_material = new Material(ShaderUtilities.ShaderRef_MobileSDF);
 
                 //tmp_material.name = texture.name + " Material";
-                tmp_material.SetTexture(ShaderUtilities.ID_MainTex, texture);
+                // tmp_material.SetTexture(ShaderUtilities.ID_MainTex, texture);
                 tmp_material.SetFloat(ShaderUtilities.ID_TextureWidth, atlasWidth);
                 tmp_material.SetFloat(ShaderUtilities.ID_TextureHeight, atlasHeight);
 
@@ -2046,8 +2068,10 @@ namespace TMPro
 
         public Texture2D EnsureAtlasTextureInitialized()
         {
-            if (m_AtlasTextures[m_AtlasTextureIndex] != null)
+            if (m_AtlasTextures?[m_AtlasTextureIndex] != null)
                 return m_AtlasTextures[m_AtlasTextureIndex];
+
+            m_AtlasTextures ??= new Texture2D[1];
             
             Debug.Log($"Creating texture atlas for dynamic font {name}");
             var texture = new Texture2D(m_AtlasWidth, m_AtlasHeight, TextureFormat.Alpha8, false);
@@ -2177,7 +2201,7 @@ namespace TMPro
             if (m_AtlasPopulationMode == AtlasPopulationMode.Dynamic && m_AtlasTextures[m_AtlasTextureIndex] == null)
             {
                 var texture = EnsureAtlasTextureInitialized();
-                material.SetTexture(ShaderUtilities.ID_MainTex, texture);
+                // material.SetTexture(ShaderUtilities.ID_MainTex, texture);
             }
 
             // Make sure atlas texture is readable.

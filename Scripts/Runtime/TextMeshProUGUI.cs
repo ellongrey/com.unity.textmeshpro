@@ -203,6 +203,8 @@ namespace TMPro
         public override void Rebuild(CanvasUpdate update)
         {
             if (this == null) return;
+            
+            Debug.Log("Rebuild");
 
             if (update == CanvasUpdate.Prelayout)
             {
@@ -215,7 +217,7 @@ namespace TMPro
             {
                 OnPreRenderCanvas();
 
-                if (!m_isMaterialDirty) return;
+                // if (!m_isMaterialDirty) return;
 
                 UpdateMaterial();
                 m_isMaterialDirty = false;
@@ -278,9 +280,11 @@ namespace TMPro
 
             if (m_sharedMaterial == null || canvasRenderer == null) return;
 
+            Debug.Log("UpdateMaterial");
+
             m_canvasRenderer.materialCount = 1;
             m_canvasRenderer.SetMaterial(materialForRendering, 0);
-            //m_canvasRenderer.SetTexture(materialForRendering.mainTexture);
+            m_canvasRenderer.SetTexture(m_fontAsset.atlasTexture);
         }
 
 

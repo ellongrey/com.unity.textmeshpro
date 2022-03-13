@@ -38,21 +38,6 @@ namespace TMPro
 
 
         /// <summary>
-        ///
-        /// </summary>
-        public override Texture mainTexture
-        {
-            get
-            {
-                if (this.sharedMaterial != null)
-                    return this.sharedMaterial.GetTexture(ShaderUtilities.ID_MainTex);
-
-                return null;
-            }
-        }
-
-
-        /// <summary>
         /// The material to be assigned to this object. Returns an instance of the material.
         /// </summary>
         public override Material material

@@ -577,7 +577,7 @@ namespace TMPro
                             m_fontAsset.EnsureAtlasTextureInitialized();
                         }
 
-                        m_fontAsset.material.SetTexture(ShaderUtilities.ID_MainTex, m_fontAsset.atlasTexture);
+                        // m_fontAsset.material.SetTexture(ShaderUtilities.ID_MainTex, m_fontAsset.atlasTexture);
                         Debug.Log($"font atlas: {m_fontAsset.atlasTexture}");
                     }
                 }
@@ -1685,9 +1685,6 @@ namespace TMPro
                     m_AutoSizeIterationCount += 1;
                 }
             }
-
-            if (m_sharedMaterial)
-                m_sharedMaterial.SetTexture(ShaderUtilities.ID_MainTex, m_fontAsset.atlasTexture);
         }
 
 
