@@ -232,6 +232,7 @@ namespace TMPro
             m_isLayoutDirty = true;
         }
 
+        private MaterialPropertyBlock m_materialPropertyBlock;
 
         /// <summary>
         /// Schedule updating of the material used by the text object.
@@ -297,12 +298,22 @@ namespace TMPro
             //if (!this.IsActive())
             //    return;
 
-            if (renderer == null || m_sharedMaterial == null)
+            if (renderer == null || m_sharedMaterial == null || m_fontAsset.atlasTexture == null)
                 return;
 
             // Only update the material if it has changed.
             if (m_renderer.sharedMaterial == null || m_renderer.sharedMaterial.GetInstanceID() != m_sharedMaterial.GetInstanceID())
                 m_renderer.sharedMaterial = m_sharedMaterial;
+
+            if (m_materialPropertyBlock == null)
+            {
+                m_materialPropertyBlock = new();
+                m_renderer.GetPropertyBlock(m_materialPropertyBlock);
+            }
+
+            m_materialPropertyBlock.SetTexture(ShaderUtilities.ID_MainTex, m_fontAsset.atlasTexture);
+           
+            m_renderer.SetPropertyBlock(m_materialPropertyBlock);
         }
 
 
