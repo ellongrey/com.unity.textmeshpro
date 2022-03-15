@@ -206,10 +206,12 @@ namespace TMPro
             fontAsset.m_SourceFontFileGUID = AssetDatabase.AssetPathToGUID(sourceFontFilePath);
             fontAsset.m_SourceFontFile_EditorRef = sourceFont;
             fontAsset.atlasPopulationMode = AtlasPopulationMode.Dynamic;
+            
+            fontAsset.isMultiAtlasTexturesEnabled = true; // was false
 
-            // Default atlas resolution is 1024 x 1024.
-            int atlasWidth = fontAsset.atlasWidth = 1024;
-            int atlasHeight = fontAsset.atlasHeight = 1024;
+            // Default atlas resolution is 4096 x 4096 (was 1024 x 1024).
+            int atlasWidth = fontAsset.atlasWidth = 4096;
+            int atlasHeight = fontAsset.atlasHeight = 4096;
             int atlasPadding = fontAsset.atlasPadding = 9;
             fontAsset.atlasRenderMode = GlyphRenderMode.SDFAA;
 
@@ -221,7 +223,9 @@ namespace TMPro
 
             texture.name = assetName + " Atlas";
             fontAsset.atlasTextures[0] = texture;
-            AssetDatabase.AddObjectToAsset(texture, fontAsset);
+            
+            if (fontAsset.atlasPopulationMode == AtlasPopulationMode.Static)
+                AssetDatabase.AddObjectToAsset(texture, fontAsset);
 
             // Add free rectangle of the size of the texture.
             int packingModifier = ((GlyphRasterModes)fontAsset.atlasRenderMode & GlyphRasterModes.RASTER_MODE_BITMAP) == GlyphRasterModes.RASTER_MODE_BITMAP ? 0 : 1;

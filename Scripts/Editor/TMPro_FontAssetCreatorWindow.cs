@@ -1401,7 +1401,8 @@ namespace TMPro.EditorUtilities
                 fontAsset.atlasHeight = m_AtlasHeight;
                 fontAsset.atlasPadding = m_Padding;
 
-                AssetDatabase.AddObjectToAsset(m_FontAtlasTexture, fontAsset);
+                if (fontAsset.atlasPopulationMode == AtlasPopulationMode.Static)
+                    AssetDatabase.AddObjectToAsset(m_FontAtlasTexture, fontAsset);
 
                 // Create new Material and Add it as Sub-Asset
                 Shader default_Shader = Shader.Find("TextMeshPro/Bitmap"); // m_shaderSelection;
@@ -1582,7 +1583,8 @@ namespace TMPro.EditorUtilities
                 fontAsset.atlasHeight = m_AtlasHeight;
                 fontAsset.atlasPadding = m_Padding;
 
-                AssetDatabase.AddObjectToAsset(m_FontAtlasTexture, fontAsset);
+                if (fontAsset.atlasPopulationMode == AtlasPopulationMode.Static)
+                    AssetDatabase.AddObjectToAsset(m_FontAtlasTexture, fontAsset);
 
                 // Create new Material and Add it as Sub-Asset
                 Shader default_Shader = Shader.Find("TextMeshPro/Distance Field");
