@@ -398,7 +398,7 @@ namespace TMPro
         {
             int sourceID = sourceMaterial.GetInstanceID();
             Texture tex = targetMaterial.GetTexture(ShaderUtilities.ID_MainTex);
-            int texID = tex.GetInstanceID();
+            int texID = tex ? tex.GetInstanceID() : 0;
             long key = (long)sourceID << 32 | (long)(uint)texID;
             FallbackMaterial fallback;
 
@@ -422,7 +422,8 @@ namespace TMPro
                 fallbackMaterial.hideFlags = HideFlags.HideAndDontSave;
 
                 #if UNITY_EDITOR
-                fallbackMaterial.name += " + " + tex.name;
+                if (tex)
+                    fallbackMaterial.name += " + " + tex.name;
                 //Debug.Log("Creating new fallback material for " + fallbackMaterial.name);
                 #endif
 

@@ -2076,6 +2076,11 @@ namespace TMPro
             Debug.Log($"Creating texture atlas for dynamic font {name}");
             var texture = new Texture2D(m_AtlasWidth, m_AtlasHeight, TextureFormat.Alpha8, false);
             m_AtlasTextures[m_AtlasTextureIndex] = texture;
+
+            texture.name = name + " Atlas";
+
+            if (m_AtlasTextureIndex > 0)
+                texture.name += " " + m_AtlasTextureIndex; 
             
             FontEngineEditorUtilities.SetAtlasTextureIsReadable(texture, true);
             FontEngine.ResetAtlasTexture(texture);
@@ -2083,12 +2088,13 @@ namespace TMPro
             int packingModifier = ((GlyphRasterModes)atlasRenderMode & GlyphRasterModes.RASTER_MODE_BITMAP) == GlyphRasterModes.RASTER_MODE_BITMAP ? 0 : 1;
             m_FreeGlyphRects = new() { new GlyphRect(0, 0, atlasWidth - packingModifier, atlasHeight - packingModifier) };
             m_UsedGlyphRects = new();
-            
-            m_CharacterLookupDictionary.Clear();
-            m_GlyphTable.Clear();
-            m_GlyphLookupDictionary.Clear();
-            m_GlyphIndexListNewlyAdded.Clear();
-            m_GlyphIndexList.Clear();
+
+            m_CharacterTable?.Clear();
+            m_CharacterLookupDictionary?.Clear();
+            m_GlyphTable?.Clear();
+            m_GlyphLookupDictionary?.Clear();
+            m_GlyphIndexListNewlyAdded?.Clear();
+            m_GlyphIndexList?.Clear();
 
             return m_AtlasTextures[m_AtlasTextureIndex];
         }
@@ -2544,6 +2550,7 @@ namespace TMPro
 
             // Initialize new atlas texture
             m_AtlasTextures[m_AtlasTextureIndex] = new Texture2D(m_AtlasWidth, m_AtlasHeight, TextureFormat.Alpha8, false);
+            m_AtlasTextures[m_AtlasTextureIndex].name = name + " Atlas " + m_AtlasTextureIndex;
             FontEngine.ResetAtlasTexture(m_AtlasTextures[m_AtlasTextureIndex]);
 
             // Clear packing GlyphRects
@@ -2556,10 +2563,9 @@ namespace TMPro
             // Add new texture as sub asset to font asset
             if (UnityEditor.EditorUtility.IsPersistent(this))
             {
-                Texture2D tex = m_AtlasTextures[m_AtlasTextureIndex];
-                tex.name = m_AtlasTexture.name + " " + m_AtlasTextureIndex;
-
-                // UnityEditor.AssetDatabase.AddObjectToAsset(m_AtlasTextures[m_AtlasTextureIndex], this);
+                if (atlasPopulationMode == AtlasPopulationMode.Static)
+                    UnityEditor.AssetDatabase.AddObjectToAsset(m_AtlasTextures[m_AtlasTextureIndex], this);
+                
                 TMP_EditorResourceManager.RegisterResourceForReimport(this);
             }
             #endif
@@ -2975,29 +2981,32 @@ namespace TMPro
 
             texture = m_AtlasTexture = m_AtlasTextures[0];
 
-            // Clear main atlas texture
-            if (texture.isReadable == false)
+            if (texture)
             {
-                #if UNITY_EDITOR && UNITY_2018_4_OR_NEWER && !UNITY_2018_4_0 && !UNITY_2018_4_1 && !UNITY_2018_4_2 && !UNITY_2018_4_3 && !UNITY_2018_4_4
+                // Clear main atlas texture
+                if (texture.isReadable == false)
+                {
+#if UNITY_EDITOR && UNITY_2018_4_OR_NEWER && !UNITY_2018_4_0 && !UNITY_2018_4_1 && !UNITY_2018_4_2 && !UNITY_2018_4_3 && !UNITY_2018_4_4
                     FontEngineEditorUtilities.SetAtlasTextureIsReadable(texture, true);
-                #else
+#else
                     Debug.LogWarning("Unable to reset font asset [" + this.name + "]'s atlas texture. Please make the texture [" + texture.name + "] readable.", texture);
                     return;
-                #endif
-            }
+#endif
+                }
 
-            if (setAtlasSizeToZero)
-            {
-                texture.Reinitialize(0, 0, TextureFormat.Alpha8, false);
-            }
-            else if (texture.width != m_AtlasWidth || texture.height != m_AtlasHeight)
-            {
-                texture.Reinitialize(m_AtlasWidth, m_AtlasHeight, TextureFormat.Alpha8, false);
-            }
+                if (setAtlasSizeToZero)
+                {
+                    texture.Reinitialize(0, 0, TextureFormat.Alpha8, false);
+                }
+                else if (texture.width != m_AtlasWidth || texture.height != m_AtlasHeight)
+                {
+                    texture.Reinitialize(m_AtlasWidth, m_AtlasHeight, TextureFormat.Alpha8, false);
+                }
 
-            // Clear texture atlas
-            FontEngine.ResetAtlasTexture(texture);
-            texture.Apply();
+                // Clear texture atlas
+                FontEngine.ResetAtlasTexture(texture);
+                texture.Apply();
+            }
         }
 
         /// <summary>
