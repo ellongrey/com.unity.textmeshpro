@@ -24,30 +24,23 @@ namespace TMPro
     [Serializable][ExcludeFromPresetAttribute]
     public class TMP_FontAsset : TMP_Asset, ISerializationCallbackReceiver
     {
-        void ISerializationCallbackReceiver.OnBeforeSerialize()
+        static void DuplicateArrayIfNeeded<T>(T[] source, ref T[] destination)
         {
-            return;
-            
-            if (m_AtlasTextures != null)
+            if (source == null)
             {
-                for (int i = 0; i < m_AtlasTextures.Length; ++i)
-                {
-                    if (m_AtlasTextures[i] != null)
-                    {
-                        DestroyImmediate(m_AtlasTextures[i], allowDestroyingAssets: true);
-                        m_AtlasTextures[i] = null;
-                    }
-                }
-            
-                if (m_AtlasTextures.Length > 1)
-                {
-                    m_AtlasTextures = new Texture2D[1];
-                    m_AtlasTextureIndex = 0;
-                }
+                destination = null;
+                return;
             }
 
-            material.SetTexture(ShaderUtilities.ID_MainTex, null);
-            
+            if (destination != null && source.Length == destination.Length)
+                return;
+
+            destination = new T[source.Length];
+            Array.Copy(source, destination, source.Length);
+        }
+        
+        void ISerializationCallbackReceiver.OnBeforeSerialize()
+        {
             switch (m_AtlasPopulationMode)
             {
                 case AtlasPopulationMode.Static:
@@ -56,7 +49,11 @@ namespace TMPro
                     m_PersistentUsedGlyphRects = new(m_UsedGlyphRects);
                     m_PersistentFreeGlyphRects = new(m_FreeGlyphRects);
                     
-                    // TODO: FontFeatureTable
+                    DuplicateArrayIfNeeded(m_AtlasTextures, ref m_PersistentAtlasTextures);
+                    m_PersistentAtlasTextureIndex = m_AtlasTextureIndex;
+                    
+                    m_PersistentFontFeatureTable ??= new();
+                    m_PersistentFontFeatureTable.CopyFrom(m_FontFeatureTable);
                     break;
                 
                 case AtlasPopulationMode.Dynamic:
@@ -78,22 +75,27 @@ namespace TMPro
                     m_CharacterTable = new(m_PersistentCharacterTable);
                     m_UsedGlyphRects = new(m_PersistentUsedGlyphRects);
                     m_FreeGlyphRects = new(m_PersistentFreeGlyphRects);
-
-                    // TODO: FontFeatureTable
                     
+                    DuplicateArrayIfNeeded(m_PersistentAtlasTextures, ref m_AtlasTextures);
+                    m_AtlasTexture = m_PersistentAtlasTextures[0];
+                    m_AtlasTextureIndex = m_PersistentAtlasTextureIndex;
+                    
+                    Debug.Log($"CopyFrom: {m_PersistentFontFeatureTable.glyphPairAdjustmentRecords.Count}");
+                    m_FontFeatureTable ??= new();
+                    m_FontFeatureTable.CopyFrom(m_PersistentFontFeatureTable);
                     break;
                 
                 case AtlasPopulationMode.Dynamic:
                     m_GlyphTable = new();
                     m_CharacterTable = new();
-
+                    
                     int packingModifier = ((GlyphRasterModes)atlasRenderMode & GlyphRasterModes.RASTER_MODE_BITMAP) == GlyphRasterModes.RASTER_MODE_BITMAP ? 0 : 1;
-            
+                    
                     m_FreeGlyphRects = new() { new GlyphRect(0, 0, atlasWidth - packingModifier, atlasHeight - packingModifier) };
                     m_UsedGlyphRects = new();
-
-                    // TODO: FontFeatureTable
-
+                    
+                    m_FontFeatureTable.glyphPairAdjustmentRecords.Clear();
+                    
                     m_AtlasTexture = null;
                     m_AtlasTextures = new Texture2D[1];
                     m_AtlasTextureIndex = 0;

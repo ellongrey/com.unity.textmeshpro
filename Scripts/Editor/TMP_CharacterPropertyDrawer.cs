@@ -162,7 +162,7 @@ namespace TMPro.EditorUtilities
                 return;
 
             // Get a reference to the Glyph Table
-            SerializedProperty prop_GlyphTable = property.serializedObject.FindProperty("m_GlyphTable");
+            SerializedProperty prop_GlyphTable = property.serializedObject.FindProperty("m_PersistentGlyphTable");
             int glyphIndex = property.FindPropertyRelative("m_GlyphIndex").intValue;
             int elementIndex = fontAsset.glyphTable.FindIndex(item => item.index == glyphIndex);
 

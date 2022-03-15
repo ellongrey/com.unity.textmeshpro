@@ -178,11 +178,11 @@ namespace TMPro.EditorUtilities
         private SerializedProperty font_tabSize_prop;
 
         private SerializedProperty m_FaceInfo_prop;
-        private SerializedProperty m_GlyphTable_prop;
-        private SerializedProperty m_CharacterTable_prop;
+        private SerializedProperty m_PersistentGlyphTable_prop;
+        private SerializedProperty m_PersistentCharacterTable_prop;
 
         private TMP_FontFeatureTable m_FontFeatureTable;
-        private SerializedProperty m_FontFeatureTable_prop;
+        private SerializedProperty m_PersistentFontFeatureTable_prop;
         private SerializedProperty m_GlyphPairAdjustmentRecords_prop;
 
         private TMP_SerializedPropertyHolder m_SerializedPropertyHolder;
@@ -243,11 +243,11 @@ namespace TMPro.EditorUtilities
             font_italicStyle_prop = serializedObject.FindProperty("italicStyle");
             font_tabSize_prop = serializedObject.FindProperty("tabSize");
 
-            m_CharacterTable_prop = serializedObject.FindProperty("m_CharacterTable");
-            m_GlyphTable_prop = serializedObject.FindProperty("m_GlyphTable");
+            m_PersistentCharacterTable_prop = serializedObject.FindProperty("m_PersistentCharacterTable");
+            m_PersistentGlyphTable_prop = serializedObject.FindProperty("m_PersistentGlyphTable");
 
-            m_FontFeatureTable_prop = serializedObject.FindProperty("m_FontFeatureTable");
-            m_GlyphPairAdjustmentRecords_prop = m_FontFeatureTable_prop?.FindPropertyRelative("m_GlyphPairAdjustmentRecords");
+            m_PersistentFontFeatureTable_prop = serializedObject.FindProperty("m_PersistentFontFeatureTable");
+            m_GlyphPairAdjustmentRecords_prop = m_PersistentFontFeatureTable_prop?.FindPropertyRelative("m_GlyphPairAdjustmentRecords");
 
             m_fontAsset = target as TMP_FontAsset;
             m_FontFeatureTable = m_fontAsset.fontFeatureTable;
@@ -683,18 +683,30 @@ namespace TMPro.EditorUtilities
             EditorGUIUtility.labelWidth = labelWidth;
             EditorGUIUtility.fieldWidth = fieldWidth;
             EditorGUI.indentLevel = 0;
-            rect = EditorGUILayout.GetControlRect(false, 24);
 
             int characterCount = m_fontAsset.characterTable.Count;
 
-            if (GUI.Button(rect, new GUIContent("<b>Character Table</b>   [" + characterCount + "]" + (rect.width > 320 ? " Characters" : ""), "List of characters contained in this font asset."), TMP_UIStyleManager.sectionHeader))
-                UI_PanelState.characterTablePanel = !UI_PanelState.characterTablePanel;
+            if (m_fontAsset.atlasPopulationMode == AtlasPopulationMode.Static)
+            {
+                rect = EditorGUILayout.GetControlRect(false, 24);
 
-            GUI.Label(rect, (UI_PanelState.characterTablePanel ? "" : s_UiStateLabel[1]), TMP_UIStyleManager.rightLabel);
+                if (GUI.Button(rect,
+                        new GUIContent(
+                            "<b>Character Table</b>   [" + characterCount + "]" +
+                            (rect.width > 320 ? " Characters" : ""),
+                            "List of characters contained in this font asset."), TMP_UIStyleManager.sectionHeader))
+                    UI_PanelState.characterTablePanel = !UI_PanelState.characterTablePanel;
+
+                GUI.Label(rect, (UI_PanelState.characterTablePanel ? "" : s_UiStateLabel[1]), TMP_UIStyleManager.rightLabel);
+            }
+            else
+            {
+                UI_PanelState.characterTablePanel = false;
+            }
 
             if (UI_PanelState.characterTablePanel)
             {
-                int arraySize = m_CharacterTable_prop.arraySize;
+                int arraySize = m_PersistentCharacterTable_prop.arraySize;
                 int itemsPerPage = 15;
 
                 // Display Glyph Management Tools
@@ -753,7 +765,7 @@ namespace TMPro.EditorUtilities
                         if (!string.IsNullOrEmpty(m_CharacterSearchPattern))
                             elementIndex = m_CharacterSearchList[i];
 
-                        SerializedProperty characterProperty = m_CharacterTable_prop.GetArrayElementAtIndex(elementIndex);
+                        SerializedProperty characterProperty = m_PersistentCharacterTable_prop.GetArrayElementAtIndex(elementIndex);
 
                         EditorGUILayout.BeginVertical(EditorStyles.helpBox);
 
@@ -880,20 +892,35 @@ namespace TMPro.EditorUtilities
             EditorGUIUtility.labelWidth = labelWidth;
             EditorGUIUtility.fieldWidth = fieldWidth;
             EditorGUI.indentLevel = 0;
-            rect = EditorGUILayout.GetControlRect(false, 24);
-
+            
             GUIStyle glyphPanelStyle = new GUIStyle(EditorStyles.helpBox);
 
             int glyphCount = m_fontAsset.glyphTable.Count;
 
-            if (GUI.Button(rect, new GUIContent("<b>Glyph Table</b>   [" + glyphCount + "]" + (rect.width > 275 ? " Glyphs" : ""), "List of glyphs contained in this font asset."), TMP_UIStyleManager.sectionHeader))
-                UI_PanelState.glyphTablePanel = !UI_PanelState.glyphTablePanel;
+            if (m_fontAsset.atlasPopulationMode == AtlasPopulationMode.Static)
+            {
+                rect = EditorGUILayout.GetControlRect(false, 24);
 
-            GUI.Label(rect, (UI_PanelState.glyphTablePanel ? "" : s_UiStateLabel[1]), TMP_UIStyleManager.rightLabel);
+                if (GUI.Button(rect,
+                        new GUIContent(
+                            "<b>Glyph Table</b>   [" + glyphCount + "]" + (rect.width > 275 ? " Glyphs" : ""),
+                            "List of glyphs contained in this font asset."), TMP_UIStyleManager.sectionHeader))
+                    UI_PanelState.glyphTablePanel = !UI_PanelState.glyphTablePanel;
+
+                GUI.Label(rect, (UI_PanelState.glyphTablePanel ? "" : s_UiStateLabel[1]),
+                    TMP_UIStyleManager.rightLabel);
+            }
+            else
+            {
+                UI_PanelState.glyphTablePanel = false;
+            }
+
+            // Sorry, currently this is not working due to UnityEditor.TextCore.Text.GlyphPropertyDrawer
+            UI_PanelState.glyphTablePanel = false;
 
             if (UI_PanelState.glyphTablePanel)
             {
-                int arraySize = m_GlyphTable_prop.arraySize;
+                int arraySize = m_PersistentGlyphTable_prop.arraySize;
                 int itemsPerPage = 15;
 
                 // Display Glyph Management Tools
@@ -953,13 +980,13 @@ namespace TMPro.EditorUtilities
                         if (!string.IsNullOrEmpty(m_GlyphSearchPattern))
                             elementIndex = m_GlyphSearchList[i];
 
-                        SerializedProperty glyphProperty = m_GlyphTable_prop.GetArrayElementAtIndex(elementIndex);
+                        SerializedProperty glyphProperty = m_PersistentGlyphTable_prop.GetArrayElementAtIndex(elementIndex);
 
                         EditorGUILayout.BeginVertical(glyphPanelStyle);
 
                         using (new EditorGUI.DisabledScope(i != m_SelectedGlyphRecord))
                         {
-                            EditorGUILayout.PropertyField(glyphProperty);
+                            // EditorGUILayout.PropertyField(glyphProperty);
                         }
 
                         EditorGUILayout.EndVertical();
@@ -1079,14 +1106,27 @@ namespace TMPro.EditorUtilities
             EditorGUIUtility.labelWidth = labelWidth;
             EditorGUIUtility.fieldWidth = fieldWidth;
             EditorGUI.indentLevel = 0;
-            rect = EditorGUILayout.GetControlRect(false, 24);
 
             int adjustmentPairCount = m_fontAsset.fontFeatureTable.glyphPairAdjustmentRecords.Count;
 
-            if (GUI.Button(rect, new GUIContent("<b>Glyph Adjustment Table</b>   [" + adjustmentPairCount + "]" + (rect.width > 340 ? " Records" : ""), "List of glyph adjustment / advanced kerning pairs."), TMP_UIStyleManager.sectionHeader))
-                UI_PanelState.fontFeatureTablePanel = !UI_PanelState.fontFeatureTablePanel;
+            if (m_fontAsset.atlasPopulationMode == AtlasPopulationMode.Static)
+            {
+                rect = EditorGUILayout.GetControlRect(false, 24);
 
-            GUI.Label(rect, (UI_PanelState.fontFeatureTablePanel ? "" : s_UiStateLabel[1]), TMP_UIStyleManager.rightLabel);
+                if (GUI.Button(rect,
+                        new GUIContent(
+                            "<b>Glyph Adjustment Table</b>   [" + adjustmentPairCount + "]" +
+                            (rect.width > 340 ? " Records" : ""), "List of glyph adjustment / advanced kerning pairs."),
+                        TMP_UIStyleManager.sectionHeader))
+                    UI_PanelState.fontFeatureTablePanel = !UI_PanelState.fontFeatureTablePanel;
+
+                GUI.Label(rect, (UI_PanelState.fontFeatureTablePanel ? "" : s_UiStateLabel[1]),
+                    TMP_UIStyleManager.rightLabel);
+            }
+            else
+            {
+                UI_PanelState.fontFeatureTablePanel = false;
+            }
 
             if (UI_PanelState.fontFeatureTablePanel)
             {
@@ -1442,15 +1482,15 @@ namespace TMPro.EditorUtilities
                 return false;
 
             // Add new element to glyph list.
-            m_GlyphTable_prop.arraySize += 1;
+            m_PersistentGlyphTable_prop.arraySize += 1;
 
             // Get a reference to the source glyph.
-            SerializedProperty sourceGlyph = m_GlyphTable_prop.GetArrayElementAtIndex(srcIndex);
+            SerializedProperty sourceGlyph = m_PersistentGlyphTable_prop.GetArrayElementAtIndex(srcIndex);
 
-            int dstIndex = m_GlyphTable_prop.arraySize - 1;
+            int dstIndex = m_PersistentGlyphTable_prop.arraySize - 1;
 
             // Get a reference to the target / destination glyph.
-            SerializedProperty targetGlyph = m_GlyphTable_prop.GetArrayElementAtIndex(dstIndex);
+            SerializedProperty targetGlyph = m_PersistentGlyphTable_prop.GetArrayElementAtIndex(dstIndex);
 
             CopyGlyphSerializedProperty(sourceGlyph, ref targetGlyph);
 
@@ -1472,22 +1512,22 @@ namespace TMPro.EditorUtilities
         /// <param name="glyphID"></param>
         void RemoveGlyphFromList(int index)
         {
-            if (index > m_GlyphTable_prop.arraySize)
+            if (index > m_PersistentGlyphTable_prop.arraySize)
                 return;
 
-            int targetGlyphIndex = m_GlyphTable_prop.GetArrayElementAtIndex(index).FindPropertyRelative("m_Index").intValue;
+            int targetGlyphIndex = m_PersistentGlyphTable_prop.GetArrayElementAtIndex(index).FindPropertyRelative("m_Index").intValue;
 
-            m_GlyphTable_prop.DeleteArrayElementAtIndex(index);
+            m_PersistentGlyphTable_prop.DeleteArrayElementAtIndex(index);
 
             // Remove all characters referencing this glyph.
-            for (int i = 0; i < m_CharacterTable_prop.arraySize; i++)
+            for (int i = 0; i < m_PersistentCharacterTable_prop.arraySize; i++)
             {
-                int glyphIndex = m_CharacterTable_prop.GetArrayElementAtIndex(i).FindPropertyRelative("m_GlyphIndex").intValue;
+                int glyphIndex = m_PersistentCharacterTable_prop.GetArrayElementAtIndex(i).FindPropertyRelative("m_GlyphIndex").intValue;
 
                 if (glyphIndex == targetGlyphIndex)
                 {
                     // Remove character
-                    m_CharacterTable_prop.DeleteArrayElementAtIndex(i);
+                    m_PersistentCharacterTable_prop.DeleteArrayElementAtIndex(i);
                 }
             }
 
@@ -1503,15 +1543,15 @@ namespace TMPro.EditorUtilities
                 return false;
 
             // Add new element to glyph list.
-            m_CharacterTable_prop.arraySize += 1;
+            m_PersistentCharacterTable_prop.arraySize += 1;
 
             // Get a reference to the source glyph.
-            SerializedProperty sourceCharacter = m_CharacterTable_prop.GetArrayElementAtIndex(srcIndex);
+            SerializedProperty sourceCharacter = m_PersistentCharacterTable_prop.GetArrayElementAtIndex(srcIndex);
 
-            int dstIndex = m_CharacterTable_prop.arraySize - 1;
+            int dstIndex = m_PersistentCharacterTable_prop.arraySize - 1;
 
             // Get a reference to the target / destination glyph.
-            SerializedProperty targetCharacter = m_CharacterTable_prop.GetArrayElementAtIndex(dstIndex);
+            SerializedProperty targetCharacter = m_PersistentCharacterTable_prop.GetArrayElementAtIndex(dstIndex);
 
             CopyCharacterSerializedProperty(sourceCharacter, ref targetCharacter);
 
@@ -1529,10 +1569,10 @@ namespace TMPro.EditorUtilities
 
         void RemoveCharacterFromList(int index)
         {
-            if (index > m_CharacterTable_prop.arraySize)
+            if (index > m_PersistentCharacterTable_prop.arraySize)
                 return;
 
-            m_CharacterTable_prop.DeleteArrayElementAtIndex(index);
+            m_PersistentCharacterTable_prop.DeleteArrayElementAtIndex(index);
 
             serializedObject.ApplyModifiedProperties();
 
@@ -1641,11 +1681,11 @@ namespace TMPro.EditorUtilities
 
             searchResults.Clear();
 
-            int arraySize = m_GlyphTable_prop.arraySize;
+            int arraySize = m_PersistentGlyphTable_prop.arraySize;
 
             for (int i = 0; i < arraySize; i++)
             {
-                SerializedProperty sourceGlyph = m_GlyphTable_prop.GetArrayElementAtIndex(i);
+                SerializedProperty sourceGlyph = m_PersistentGlyphTable_prop.GetArrayElementAtIndex(i);
 
                 int id = sourceGlyph.FindPropertyRelative("m_Index").intValue;
 
@@ -1672,11 +1712,11 @@ namespace TMPro.EditorUtilities
 
             searchResults.Clear();
 
-            int arraySize = m_CharacterTable_prop.arraySize;
+            int arraySize = m_PersistentCharacterTable_prop.arraySize;
 
             for (int i = 0; i < arraySize; i++)
             {
-                SerializedProperty sourceCharacter = m_CharacterTable_prop.GetArrayElementAtIndex(i);
+                SerializedProperty sourceCharacter = m_PersistentCharacterTable_prop.GetArrayElementAtIndex(i);
 
                 int id = sourceCharacter.FindPropertyRelative("m_Unicode").intValue;
 

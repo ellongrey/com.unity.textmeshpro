@@ -42,6 +42,21 @@ namespace TMPro
         // Utility Functions
         // =============================================
 
+        public void CopyFrom(TMP_FontFeatureTable other)
+        {
+            m_GlyphPairAdjustmentRecords ??= new();
+            m_GlyphPairAdjustmentRecords.Clear();
+            
+            for (int i = 0; i < other.m_GlyphPairAdjustmentRecords.Count; ++i)
+            {
+                var src = other.m_GlyphPairAdjustmentRecords[i];
+                var dst = new TMP_GlyphPairAdjustmentRecord(src.firstAdjustmentRecord, src.secondAdjustmentRecord);
+                dst.m_FeatureLookupFlags = src.m_FeatureLookupFlags;
+                m_GlyphPairAdjustmentRecords.Add(dst);
+            }
+            m_GlyphPairAdjustmentRecordLookupDictionary.Clear();
+        }
+
         /// <summary>
         /// Sort the glyph pair adjustment records by glyph index.
         /// </summary>
