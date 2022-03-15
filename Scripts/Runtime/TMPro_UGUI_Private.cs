@@ -1289,10 +1289,11 @@ namespace TMPro
                     }
                 }
 
-                if (character.elementType == TextElementType.Character)
+                if (character.elementType == TextElementType.Character && unicode != 0x200B)
                 {
                     if (character.textAsset.instanceID != m_currentFontAsset.instanceID)
                     {
+                        Debug.Log($"fallback or alternative needed : for character 0x{character.unicode:X4}");
                         isUsingFallbackOrAlternativeTypeface = true;
                         m_currentFontAsset = character.textAsset as TMP_FontAsset;
 
