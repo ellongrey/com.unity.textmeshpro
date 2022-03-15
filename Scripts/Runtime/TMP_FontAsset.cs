@@ -51,20 +51,20 @@ namespace TMPro
             switch (m_AtlasPopulationMode)
             {
                 case AtlasPopulationMode.Static:
-                    m_SerializedGlyphTable = new(m_GlyphTable);
-                    m_SerializedCharacterTable = new(m_CharacterTable);
-                    m_SerializedUsedGlyphRects = new(m_UsedGlyphRects);
-                    m_SerializedFreeGlyphRects = new(m_FreeGlyphRects);
+                    m_PersistentGlyphTable = new(m_GlyphTable);
+                    m_PersistentCharacterTable = new(m_CharacterTable);
+                    m_PersistentUsedGlyphRects = new(m_UsedGlyphRects);
+                    m_PersistentFreeGlyphRects = new(m_FreeGlyphRects);
                     
                     // TODO: FontFeatureTable
                     break;
                 
                 case AtlasPopulationMode.Dynamic:
-                    m_SerializedGlyphTable?.Clear();
-                    m_SerializedCharacterTable?.Clear();
-                    m_SerializedUsedGlyphRects?.Clear();
-                    m_SerializedFreeGlyphRects?.Clear();
-                    m_SerializedFontFeatureTable?.glyphPairAdjustmentRecords?.Clear();
+                    m_PersistentGlyphTable?.Clear();
+                    m_PersistentCharacterTable?.Clear();
+                    m_PersistentUsedGlyphRects?.Clear();
+                    m_PersistentFreeGlyphRects?.Clear();
+                    m_PersistentFontFeatureTable?.glyphPairAdjustmentRecords?.Clear();
                     break;
             }
         }
@@ -74,10 +74,10 @@ namespace TMPro
             switch (m_AtlasPopulationMode)
             {
                 case AtlasPopulationMode.Static:
-                    m_GlyphTable = new(m_SerializedGlyphTable);
-                    m_CharacterTable = new(m_SerializedCharacterTable);
-                    m_UsedGlyphRects = new(m_SerializedUsedGlyphRects);
-                    m_FreeGlyphRects = new(m_SerializedFreeGlyphRects);
+                    m_GlyphTable = new(m_PersistentGlyphTable);
+                    m_CharacterTable = new(m_PersistentCharacterTable);
+                    m_UsedGlyphRects = new(m_PersistentUsedGlyphRects);
+                    m_FreeGlyphRects = new(m_PersistentFreeGlyphRects);
 
                     // TODO: FontFeatureTable
                     
@@ -192,7 +192,7 @@ namespace TMPro
         private List<Glyph> m_GlyphTable = new List<Glyph>();
 
         [SerializeField] [FormerlySerializedAs(nameof(m_GlyphTable))]
-        private List<Glyph> m_SerializedGlyphTable = new List<Glyph>();
+        private List<Glyph> m_PersistentGlyphTable = new List<Glyph>();
 
         /// <summary>
         /// Dictionary used to lookup glyphs contained in the font asset by their index.
@@ -223,7 +223,7 @@ namespace TMPro
         private List<TMP_Character> m_CharacterTable = new List<TMP_Character>();
 
         [SerializeField] [FormerlySerializedAs(nameof(m_CharacterTable))]
-        private List<TMP_Character> m_SerializedCharacterTable = new List<TMP_Character>();
+        private List<TMP_Character> m_PersistentCharacterTable = new List<TMP_Character>();
 
         /// <summary>
         /// Dictionary used to lookup characters contained in the font asset by their unicode values.
@@ -301,7 +301,7 @@ namespace TMPro
         private Texture2D[] m_AtlasTextures;
 
         [SerializeField] [FormerlySerializedAs(nameof(m_AtlasTextures))]
-        private Texture2D[] m_SerializedAtlasTextures;
+        private Texture2D[] m_PersistentAtlasTextures;
 
         /// <summary>
         /// Index of the font atlas texture that still has available space to add new glyphs.
@@ -310,7 +310,7 @@ namespace TMPro
         internal int m_AtlasTextureIndex;
         
         [SerializeField] [FormerlySerializedAs(nameof(m_AtlasTextureIndex))]
-        private int m_SerializedAtlasTextureIndex;
+        private int m_PersistentAtlasTextureIndex;
 
 
         /// <summary>
@@ -353,7 +353,7 @@ namespace TMPro
         private List<GlyphRect> m_UsedGlyphRects;
 
         [SerializeField] [FormerlySerializedAs(nameof(m_UsedGlyphRects))]
-        private List<GlyphRect> m_SerializedUsedGlyphRects;
+        private List<GlyphRect> m_PersistentUsedGlyphRects;
 
         /// <summary>
         /// List of spaces available in a given texture to add new glyphs.
@@ -367,7 +367,7 @@ namespace TMPro
         private List<GlyphRect> m_FreeGlyphRects;
 
         [SerializeField] [FormerlySerializedAs(nameof(m_FreeGlyphRects))]
-        private List<GlyphRect> m_SerializedFreeGlyphRects;
+        private List<GlyphRect> m_PersistentFreeGlyphRects;
 
         /// <summary>
         /// The general information about the font.
@@ -449,7 +449,7 @@ namespace TMPro
         internal TMP_FontFeatureTable m_FontFeatureTable = new TMP_FontFeatureTable();
 
         [SerializeField] [FormerlySerializedAs(nameof(m_FontFeatureTable))]
-        internal TMP_FontFeatureTable m_SerializedFontFeatureTable = new TMP_FontFeatureTable();
+        internal TMP_FontFeatureTable m_PersistentFontFeatureTable = new TMP_FontFeatureTable();
 
         // Legacy field that will eventually be removed
         [SerializeField]
