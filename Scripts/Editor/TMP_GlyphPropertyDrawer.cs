@@ -8,7 +8,7 @@ using System.Collections;
 namespace TMPro.EditorUtilities
 {
 
-    [CustomPropertyDrawer(typeof(Glyph))]
+    [CustomPropertyDrawer(typeof(Glyph), true)]
     public class TMP_GlyphPropertyDrawer : PropertyDrawer
     {
         private string k_ColorProperty = "_Color";
