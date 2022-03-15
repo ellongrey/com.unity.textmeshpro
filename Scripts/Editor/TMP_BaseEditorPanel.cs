@@ -396,6 +396,11 @@ namespace TMPro.EditorUtilities
 
             if (hasChanged)
             {
+                marginOffset.x = Mathf.Max(0, marginOffset.x);
+                marginOffset.y = Mathf.Max(0, marginOffset.y);
+                marginOffset.z = Mathf.Max(0, marginOffset.z);
+                marginOffset.w = Mathf.Max(0, marginOffset.w);
+                
                 Undo.RecordObjects(new Object[] {m_RectTransform, m_TextComponent }, "Margin Changes");
                 m_TextComponent.margin = marginOffset;
                 EditorUtility.SetDirty(target);
