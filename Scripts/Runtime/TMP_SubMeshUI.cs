@@ -698,7 +698,7 @@ namespace TMPro
 
             canvasRenderer.materialCount = 1;
             canvasRenderer.SetMaterial(materialForRendering, 0);
-            //canvasRenderer.SetTexture(materialForRendering.mainTexture);
+            canvasRenderer.SetTexture(m_fontAsset.atlasTexture);
 
             #if UNITY_EDITOR
             if (m_sharedMaterial != null && gameObject.name != "TMP SubMeshUI [" + m_sharedMaterial.name + "]")

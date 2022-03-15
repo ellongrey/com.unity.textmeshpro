@@ -586,6 +586,7 @@ namespace TMPro
             //TMP_UpdateRegistry.RegisterCanvasElementForGraphicRebuild((ICanvasElement)this);
         }
 
+        private MaterialPropertyBlock m_materialPropertyBlock;
 
         /// <summary>
         ///
@@ -598,6 +599,17 @@ namespace TMPro
 
             m_renderer.sharedMaterial = m_sharedMaterial;
 
+            if (m_materialPropertyBlock == null)
+            {
+                m_materialPropertyBlock = new();
+                m_renderer.GetPropertyBlock(m_materialPropertyBlock);
+            }
+
+            if (m_fontAsset.atlasTexture != null)
+                m_materialPropertyBlock.SetTexture(ShaderUtilities.ID_MainTex, m_fontAsset.atlasTexture);
+           
+            m_renderer.SetPropertyBlock(m_materialPropertyBlock);
+            
             // Special handling to keep the Culling of the material in sync with parent text object
             if (m_sharedMaterial.HasProperty(ShaderUtilities.ShaderTag_CullMode))
             {
