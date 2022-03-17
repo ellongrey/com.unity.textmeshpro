@@ -605,8 +605,8 @@ namespace TMPro
                 m_renderer.GetPropertyBlock(m_materialPropertyBlock);
             }
 
-            if (m_fontAsset.atlasTexture != null)
-                m_materialPropertyBlock.SetTexture(ShaderUtilities.ID_MainTex, m_fontAsset.atlasTexture);
+            // if (m_fontAsset.atlasTexture != null)
+            //     m_materialPropertyBlock.SetTexture(ShaderUtilities.ID_MainTex, m_fontAsset.atlasTextures[atlasIndex]);
            
             m_renderer.SetPropertyBlock(m_materialPropertyBlock);
             

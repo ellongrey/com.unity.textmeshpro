@@ -282,9 +282,9 @@ namespace TMPro
         {
             get
             {
-                if (m_AtlasTextures == null)
+                if (m_AtlasTextures == null || m_AtlasTextures[0] == null)
                 {
-                    //
+                    EnsureAtlasTextureInitialized();
                 }
 
                 //if (m_IsUsingDynamicTextures)
