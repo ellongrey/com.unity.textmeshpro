@@ -114,7 +114,7 @@ namespace TMPro.EditorUtilities
             refs.Add(mat);
 
             // Get materials matching the search pattern.
-            string searchPattern = "t:Material" + " " + fontAsset.name.Split(new char[] { ' ' })[0];
+            string searchPattern = "t:Material" + " " + fontAsset.name.Split(' ')[0];
             string[] materialAssetGUIDs = AssetDatabase.FindAssets(searchPattern);
 
             for (int i = 0; i < materialAssetGUIDs.Length; i++)
@@ -122,16 +122,8 @@ namespace TMPro.EditorUtilities
                 string materialPath = AssetDatabase.GUIDToAssetPath(materialAssetGUIDs[i]);
                 Material targetMaterial = AssetDatabase.LoadAssetAtPath<Material>(materialPath);
 
-                if (targetMaterial.HasProperty(ShaderUtilities.ID_MainTex) && targetMaterial.GetTexture(ShaderUtilities.ID_MainTex) != null && mat.GetTexture(ShaderUtilities.ID_MainTex) != null && targetMaterial.GetTexture(ShaderUtilities.ID_MainTex).GetInstanceID() == mat.GetTexture(ShaderUtilities.ID_MainTex).GetInstanceID())
-                {
-                    if (!refs.Contains(targetMaterial))
-                        refs.Add(targetMaterial);
-                }
-                else
-                {
-                    // TODO: Find a more efficient method to unload resources.
-                    //Resources.UnloadAsset(targetMaterial.GetTexture(ShaderUtilities.ID_MainTex));
-                }
+                if (!refs.Contains(targetMaterial))
+                    refs.Add(targetMaterial);
             }
 
             return refs.ToArray();
