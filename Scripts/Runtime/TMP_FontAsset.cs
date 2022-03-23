@@ -80,7 +80,8 @@ namespace TMPro
                     m_AtlasTexture = m_PersistentAtlasTextures[0];
                     m_AtlasTextureIndex = m_PersistentAtlasTextureIndex;
                     
-                    Debug.Log($"CopyFrom: {m_PersistentFontFeatureTable.glyphPairAdjustmentRecords.Count}");
+                    TextMeshPro.LogVerbose($"CopyFrom: {m_PersistentFontFeatureTable.glyphPairAdjustmentRecords.Count}");
+                    
                     m_FontFeatureTable ??= new();
                     m_FontFeatureTable.CopyFrom(m_PersistentFontFeatureTable);
                     break;
@@ -2075,7 +2076,8 @@ namespace TMPro
 
             m_AtlasTextures ??= new Texture2D[1];
             
-            Debug.Log($"Creating texture atlas for dynamic font {name}");
+            TextMeshPro.LogVerbose($"Creating texture atlas for dynamic font {name}");
+            
             var texture = new Texture2D(m_AtlasWidth, m_AtlasHeight, TextureFormat.Alpha8, false);
             m_AtlasTextures[m_AtlasTextureIndex] = texture;
 

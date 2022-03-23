@@ -203,8 +203,8 @@ namespace TMPro
         public override void Rebuild(CanvasUpdate update)
         {
             if (this == null) return;
-            
-            Debug.Log("Rebuild");
+
+            TextMeshPro.LogVerbose("Rebuild");
 
             if (update == CanvasUpdate.Prelayout)
             {
@@ -280,7 +280,7 @@ namespace TMPro
 
             if (m_sharedMaterial == null || canvasRenderer == null) return;
 
-            Debug.Log("UpdateMaterial");
+            TextMeshPro.LogVerbose("UpdateMaterial");
 
             m_canvasRenderer.materialCount = 1;
             m_canvasRenderer.SetMaterial(materialForRendering, 0);

@@ -1,6 +1,9 @@
 using UnityEngine;
 using System;
+using System.Diagnostics;
 using UnityEngine.UI;
+using Debug = UnityEngine.Debug;
+using Object = UnityEngine.Object;
 
 namespace TMPro
 {
@@ -12,6 +15,11 @@ namespace TMPro
     [HelpURL("https://docs.unity3d.com/Packages/com.unity.textmeshpro@3.0")]
     public partial class TextMeshPro : TMP_Text, ILayoutElement
     {
+        [Conditional("TEXTMESHPRO_VERBOSE"), DebuggerHidden]
+        
+        internal static void LogVerbose(string msg, Object context = null)
+            => Debug.Log(msg, context);
+        
         // Public Properties and Serializable Properties
 
         [SerializeField] internal int _SortingLayer;
