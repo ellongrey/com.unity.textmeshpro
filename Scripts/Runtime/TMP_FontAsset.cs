@@ -2084,9 +2084,8 @@ namespace TMPro
             texture.name = name + " Atlas";
 
             if (m_AtlasTextureIndex > 0)
-                texture.name += " " + m_AtlasTextureIndex; 
-            
-            FontEngineEditorUtilities.SetAtlasTextureIsReadable(texture, true);
+                texture.name += " " + m_AtlasTextureIndex;
+
             FontEngine.ResetAtlasTexture(texture);
             
             int packingModifier = ((GlyphRasterModes)atlasRenderMode & GlyphRasterModes.RASTER_MODE_BITMAP) == GlyphRasterModes.RASTER_MODE_BITMAP ? 0 : 1;
