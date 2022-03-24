@@ -672,7 +672,7 @@ namespace TMPro
         }
         #endif
 
-        private static string s_DefaultMaterialSuffix = " Atlas Material";
+        private static string s_DefaultMaterialSuffix = " - Default";
 
         public void ReadFontAssetDefinition()
         {
