@@ -509,12 +509,12 @@ namespace TMPro
                 if (m_fontAsset.characterLookupTable == null)
                     m_fontAsset.ReadFontAssetDefinition();
 
-                // If font atlas texture doesn't match the assigned material font atlas, switch back to default material specified in the Font Asset.
-                if (m_sharedMaterial == null || m_sharedMaterial.GetTexture(ShaderUtilities.ID_MainTex) == null || m_fontAsset.atlasTexture.GetInstanceID() != m_sharedMaterial.GetTexture(ShaderUtilities.ID_MainTex).GetInstanceID())
+                // If the shared material was lost somehow, switch back to default material specified in the Font Asset.
+                if (m_sharedMaterial == null || m_sharedMaterial.GetTexture(ShaderUtilities.ID_MainTex) == null)
                 {
                     if (m_fontAsset.material == null)
                         Debug.LogWarning("The Font Atlas Texture of the Font Asset " + m_fontAsset.name + " assigned to " + gameObject.name + " is missing.", this);
-                    else
+                    else if (m_sharedMaterial == null)
                         m_sharedMaterial = m_fontAsset.material;
                 }
 

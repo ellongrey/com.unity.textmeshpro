@@ -559,25 +559,26 @@ namespace TMPro
                     m_baseMaterial = null;
                 }
 
-                if (m_sharedMaterial == null)
+                // If the shared material was lost somehow, switch back to default material specified in the Font Asset.
+                if (m_sharedMaterial == null || m_sharedMaterial.GetTexture(ShaderUtilities.ID_MainTex) == null)
                 {
-                    Debug.Log("alala");
+                    TextMeshPro.LogVerbose("Null material or texture detected");
                     if (m_fontAsset.material == null)
                         Debug.LogWarning("The Font Atlas Texture of the Font Asset " + m_fontAsset.name + " assigned to " + gameObject.name + " is missing.", this);
                     else
                     {
-                        m_sharedMaterial = m_fontAsset.material;
+                        if (m_sharedMaterial == null)
+                            m_sharedMaterial = m_fontAsset.material;
 
                         if (m_fontAsset.atlasTexture == null)
                         {
-                            Debug.Log("Null atlas detected");
+                            TextMeshPro.LogVerbose("Null atlas detected");
                             m_havePropertiesChanged = true;
                             SetVerticesDirty();
                             m_fontAsset.EnsureAtlasTextureInitialized();
                         }
 
-                        // m_fontAsset.material.SetTexture(ShaderUtilities.ID_MainTex, m_fontAsset.atlasTexture);
-                        Debug.Log($"font atlas: {m_fontAsset.atlasTexture}");
+                        TextMeshPro.LogVerbose($"font atlas: {m_fontAsset.atlasTexture}");
                     }
                 }
             }
