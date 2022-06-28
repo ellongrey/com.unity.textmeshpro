@@ -1953,7 +1953,8 @@ namespace TMPro
                     switch (charCode)
                     {
                         case 0x03:
-                            m_textInfo.characterInfo[m_characterCount].textElement = m_currentFontAsset.characterLookupTable[0x03];
+                            if (m_currentFontAsset.characterLookupTable.TryGetValue(0x03, out var breakElem))
+                                m_textInfo.characterInfo[m_characterCount].textElement = breakElem;
                             m_isTextTruncated = true;
                             break;
                         case 0x2D:
