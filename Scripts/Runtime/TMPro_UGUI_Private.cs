@@ -559,6 +559,9 @@ namespace TMPro
                     m_baseMaterial = null;
                 }
 
+                // HACK: Force shared material to be associated font's one
+                m_sharedMaterial = m_fontAsset.material;
+
                 // If the shared material was lost somehow, switch back to default material specified in the Font Asset.
                 if (m_sharedMaterial == null || m_sharedMaterial.GetTexture(ShaderUtilities.ID_MainTex) == null)
                 {
