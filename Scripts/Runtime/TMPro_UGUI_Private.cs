@@ -1289,7 +1289,8 @@ namespace TMPro
                     }
                 }
 
-                if (character.elementType == TextElementType.Character && unicode != 0x200B)
+                if (character.elementType == TextElementType.Character 
+                    && (unicode != 0x200B && unicode != 0x0A))
                 {
                     if (character.textAsset.instanceID != m_currentFontAsset.instanceID)
                     {
